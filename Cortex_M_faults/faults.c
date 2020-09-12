@@ -6,39 +6,45 @@ extern void *gl_unaligned_buffer;
 void disable_n_access_fpu(void) 
 {
 
-  // Let's disable the FPU
+  /* Let's disable the FPU */
   __asm volatile(
-      "ldr r0, =0xE000ED88 \n"
-      "mov r1, #0 \n"
-      "str r1, [r0]	\n"
-      "dsb \n"
-      "vmov r0, s0 \n"
-      );
+ 
+	     	  "ldr r0, =0xE000ED88 \n"
+		  "mov r1, #0 \n"
+		  "str r1, [r0]	\n"
+		  "dsb \n"
+
+		  /* Try to access FPU */
+      		  "vmov r0, s0 \n"
+     		 );
 }
 
 static void set_pending_irq(void) 
 {
 
-	NVIC->ISER[0] |= (1<<1) ;
+  NVIC->ISER[0] |= (1<<1) ;
 
   // Pend an interrupt
   NVIC->ISPR[0] |= (1<<1);
 	
-  // flush pipeline to ensure exception takes effect before we return from this routine and the ISR doesn't fire before
+  /* flush pipeline to ensure exception takes effect before we return from this routine and the ISR doesn't fire before */
   //__asm("isb");
+
 }
 
-void bus_fault_stkerr(void) {
+void bus_fault_stkerr(void) 
+{
 	
   extern uint32_t _start_of_ram[];
   uint8_t var;
   unsigned long long distance_to_ram_bottom = (uint32_t)&var - (uint32_t)0x20000000;
 	
-	/* Bloat up the RAM */ 
+  /* Bloat up the RAM */ 
 	
   volatile uint8_t big_buf[distance_to_ram_bottom - 8];
 	
-  for (uint64_t i = 0; i < sizeof(big_buf); i++) {
+  for (uint64_t i = 0; i < sizeof(big_buf); i++) 
+  {
     big_buf[i] = i;
   }
   
@@ -74,27 +80,26 @@ void bus_fault_precise(void)
 
 	NVIC_EnableIRQ(QEI0_IRQn) ;
 	
-/** You can uncomment this and comment above 2 lines as well  **/ 
-/** 
+	/** You can uncomment this and comment above 2 lines as well  **/ 
+	/* 
 	
 	volatile uint32_t *a = (volatile uint32_t*)0x10000000 ;
 	volatile uint32_t b = 12; 
 	
 	b = b/(*a) ;
 	
-**/ 
+	*/ 
 }
 
 void bus_fault_imprecise(void)
 {
 	 volatile uint64_t *buf = (volatile uint64_t *)0x30000000;
-  *buf = 0x1122334455667788;
+  	 *buf = 0x1122334455667788;
 }
 
 void bus_fault_ibuserr(void) 
 {
-	void (*fptr)(void) = (void(*)(void))0x00040000;		// Bus Fault :  I-BUS Error 
-	
+	void (*fptr)(void) = (void(*)(void))0x00040000;		// Bus Fault :  I-BUS Error 	
 	(*fptr)(); 
 
 }
@@ -109,7 +114,6 @@ void mem_manage_iaccviol(void)
 void usage_fault_invstate(void) 
 {
 	void (*fptr)(void) = (void(*)(void))0x00000514; // usage fault: Invalid state due to T-Bit
-	
 	(*fptr)();
 
 }
@@ -117,7 +121,6 @@ void usage_fault_invstate(void)
 void usage_fault_undefinstr(void) 
 {
 	void (*fptr)(void) = (void(*)(void))0x00001001;	 // usage fault: Undefined instruction 
-		
 	(*fptr)();
 }
 
@@ -144,3 +147,69 @@ void usage_fault_unaligned_mem_access(void)
   	*buf = 0x1122334455667788;
 
 }
+
+void QEI0_Handler(void)
+{
+	QEI0->ISC = (1<<1) ; 
+	__asm("PUSH {R0}"); 
+}
+
+
+void enter_priv_mode(void)
+{
+	__asm ("MRS R1, CONTROL  \n"
+	       "AND R1,R1, #0xFE \n"
+	       "MSR CONTROL, R1  \n" ) ;
+} 
+
+
+void enter_unpriv_mode(void)
+{
+	__asm ("MRS R1, CONTROL") ; 
+	__asm ("ORR R1,R1, #0x01") ;
+	__asm ("MSR CONTROL, R1") ;
+}
+
+
+
+void trigger_fault (uint8_t fault_type)
+{
+	switch(fault_type) 
+	{
+		case BUS_FAULT_PRECISE:	bus_fault_precise(); 
+		break ; 
+		
+		case BUS_FAULT_IMPRECISE: bus_fault_imprecise(); 
+		break ; 
+
+		case BUS_FAULT_IBUSERR: bus_fault_ibuserr(); 
+		break ; 
+		
+		case MEM_MANAGE_IACCVIOL: mem_manage_iaccviol() ; 
+		break ; 
+		
+		case USAGE_FAULT_INVSTATE: usage_fault_invstate() ; 
+		break ;
+	
+		case USAGE_FAULT_UNDEFSTR: usage_fault_undefinstr() ; 
+		break ;
+
+		case USAGE_FAULT_INVPC: usage_fault_invpc() ; 
+		break ; 		
+		
+		case USAGE_FAULT_DIV_BY_ZERO: usage_fault_div_by_zero() ; 
+		break ; 
+		
+		case USAGE_FAULT_UNALIGNED_MEM_ACCESS: usage_fault_unaligned_mem_access() ; 
+		break ; 
+						
+		case USAGE_FAULT_NOCP: disable_n_access_fpu() ; 
+		break ; 
+						
+		case BUS_FAULT_STKERR: bus_fault_stkerr() ;  
+	 	break ; 
+						
+	}
+
+}
+	
