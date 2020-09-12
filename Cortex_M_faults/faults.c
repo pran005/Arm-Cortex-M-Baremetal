@@ -101,8 +101,7 @@ void bus_fault_ibuserr(void)
 
 void mem_manage_iaccviol(void)
 {
-	void (*fptr)(void) = (void(*)(void))0xE0000615;	    // MemManage fault : CPU tried to execute code from a eXecute Never memory region
-																										 // I-code fetch / Instruction Access violation  
+	void (*fptr)(void) = (void(*)(void))0xE0000615;	    // MemManage fault : CPU tried to execute code from a eXecute Never memory region 																     // I-code fetch / Instruction Access violation  
 	(*fptr)();
 
 }
@@ -142,6 +141,6 @@ void usage_fault_unaligned_mem_access(void)
 	SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk ; 
 	
 	uint64_t *buf = gl_unaligned_buffer;
-  *buf = 0x1122334455667788;
+  	*buf = 0x1122334455667788;
 
 }

@@ -1,16 +1,16 @@
-#include	<tm4c123gh6pm.h>
+#include  <tm4c123gh6pm.h>
 #include  "faults.h" 
 
 /** @TODO: 
-																											
-					 MemManage Faults:	1. DACCVIOL
-															2. MSTKERR
-															3. MUNSKERR
-															4. MLSPERR 		 (Specific to FPU)
-					
-					 Bus Fault : 				
-															1. UNSTKERR
-															2. LSPERR (Specific to FPU)
+												
+  MemManage Faults:	1. DACCVIOL
+			2. MSTKERR
+			3. MUNSKERR
+			4. MLSPERR 		 (Specific to FPU)
+		
+ Bus Fault : 				
+			1. UNSTKERR
+			2. LSPERR (Specific to FPU)
 													
 **/
 	
@@ -43,37 +43,37 @@ void trigger_fault (uint8_t fault_type)
 	switch(fault_type) 
 	{
 		case 0:	bus_fault_precise(); 
-						break ; 
+		break ; 
 		
 		case 1: bus_fault_imprecise(); 
-						break ; 
+		break ; 
 
 		case 2: bus_fault_ibuserr(); 
-						break ; 
+		break ; 
 		
 		case 3: mem_manage_iaccviol() ; 
-						break ; 
+		break ; 
 		
 		case 4: usage_fault_invstate() ; 
-						break ;
-		
+		break ;
+	
 		case 5: usage_fault_undefinstr() ; 
-						break ;
+		break ;
 
 		case 6: usage_fault_invpc() ; 
-						break ; 		
+		break ; 		
 		
 		case 7: usage_fault_div_by_zero() ; 
-						break ; 
+		break ; 
 		
 		case 8: usage_fault_unaligned_mem_access() ; 
-						break ; 
+		break ; 
 						
 		case 9: disable_n_access_fpu() ; 
-						break ; 
+		break ; 
 						
 		case 10: bus_fault_stkerr() ;  
-						 break ; 
+	 	break ; 
 						
 	}
 
