@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file    main.c 
+  * @author  Pranjal Shrivastava
+  * @version v1.5 - Cortex-M Faults  
+  * @date    12-September-2019
+  * @brief   Main program body 
+  ******************************************************************************
+ **/
+ 
 #include  <tm4c123gh6pm.h>
 #include  "faults.h" 
 

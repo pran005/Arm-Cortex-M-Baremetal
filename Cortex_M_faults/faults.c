@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file    faults.c 
+  * @author  Pranjal Shrivastava
+  * @version v1.5 - Cortex-M Faults  
+  * @date    12-September-2019
+  * @brief   Driver code for implementing faults 
+  ******************************************************************************
+ **/
+ 
 #include "TM4C123.h"                    // Device header
 #include  "faults.h" 
 
@@ -21,10 +31,10 @@ void disable_n_access_fpu(void)
 
 static void set_pending_irq(void) 
 {
-
+	
   NVIC->ISER[0] |= (1<<1) ;
 
-  // Pend an interrupt
+  /* Pend an interrupt */ 
   NVIC->ISPR[0] |= (1<<1);
 	
   /* flush pipeline to ensure exception takes effect before we return from this routine and the ISR doesn't fire before */
@@ -35,17 +45,16 @@ static void set_pending_irq(void)
 void bus_fault_stkerr(void) 
 {
 	
-  extern uint32_t _start_of_ram[];
   uint8_t var;
-  unsigned long long distance_to_ram_bottom = (uint32_t)&var - (uint32_t)0x20000000;
+  unsigned long long distance_from_ram_bottom = (uint32_t)&var - (uint32_t)0x20000000;
 	
   /* Bloat up the RAM */ 
 	
-  volatile uint8_t big_buf[distance_to_ram_bottom - 8];
+  volatile uint8_t buffer[distance_from_ram_bottom - 8];
 	
-  for (uint64_t i = 0; i < sizeof(big_buf); i++) 
+  for (uint64_t i = 0; i < sizeof(buffer); i++) 
   {
-    big_buf[i] = i;
+    buffer[i] = i;
   }
   
   set_pending_irq();
@@ -53,6 +62,7 @@ void bus_fault_stkerr(void)
 
 void enable_qei_interrupts(void)
 {
+	/* The following sets up the QEI peripheral for the TM4C MCU */ 
 	SYSCTL -> RCGCQEI |= (1<<0) ; 
 	SYSCTL -> RCGCGPIO |= (1<<3) ;  
 
@@ -68,6 +78,8 @@ void enable_qei_interrupts(void)
 	QEI0->LOAD = 25000000 ;	
 	QEI0->CTL |= (1<<0) | (1<<3) | (1<<5) | (1<<13) ;
 	QEI0->INTEN = (1<<1) ; 
+	
+	/* Enable Interrupt for QEI */
 	NVIC_EnableIRQ(QEI0_IRQn) ; 
 }
 
