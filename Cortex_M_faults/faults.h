@@ -3,7 +3,7 @@
   * @file    faults.h
   * @author  Pranjal Shrivastava
   * @version v1.5 - Cortex-M Faults  
-  * @date    12-September-2019
+  * @date    12-September-2020
   * @brief   API declaration of the driver code 
   ******************************************************************************
  **/
