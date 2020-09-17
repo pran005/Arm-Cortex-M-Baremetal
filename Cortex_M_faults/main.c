@@ -32,7 +32,7 @@ int main(void)
 {
 	gl_unaligned_buffer = &buffer[1];  //mis-align the buffer
 
-	trigger_fault(BUS_FAULT_IMPRECISE) ; 
+	trigger_fault(BUS_FAULT_STKERR) ; 
 	while(1) ; 
  
 }
