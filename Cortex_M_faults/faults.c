@@ -37,9 +37,6 @@ static void set_pending_irq(void)
   /* Pend an interrupt */ 
   NVIC->ISPR[0] |= (1<<1);
 	
-  /* flush pipeline to ensure exception takes effect before we return from this routine and the ISR doesn't fire before */
-  //__asm("isb");
-
 }
 
 void bus_fault_stkerr(void) 
