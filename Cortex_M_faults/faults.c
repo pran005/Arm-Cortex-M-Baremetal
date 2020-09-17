@@ -103,7 +103,7 @@ void bus_fault_precise(void)
 void bus_fault_imprecise(void)
 {
 	 volatile uint64_t *buf = (volatile uint64_t *)0x30000000;
-  	 *buf = 0x1122334455667788;
+  	 *buf = 0x123456789ABCDEF ; 
 }
 
 void bus_fault_ibuserr(void) 
@@ -153,7 +153,7 @@ void usage_fault_unaligned_mem_access(void)
 	SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk ; 
 	
 	uint64_t *buf = gl_unaligned_buffer;
-  	*buf = 0x1122334455667788;
+  	*buf = 0x123456789ABCDEF;
 
 }
 

@@ -18,7 +18,7 @@
 			3. MUNSKERR
 			4. MLSPERR 		 (Specific to FPU)
 		
- Bus Fault : 				
+  Bus Fault : 				
 			1. UNSTKERR
 			2. LSPERR (Specific to FPU)
 													
