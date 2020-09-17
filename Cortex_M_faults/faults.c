@@ -111,38 +111,38 @@ void bus_fault_imprecise(void)
 
 void bus_fault_ibuserr(void) 
 {
-	void (*fptr)(void) = (void(*)(void))0x00040000;		// Bus Fault :  I-BUS Error 	
+	void (*fptr)(void) = (void(*)(void))0x00040000;		/* Bus Fault :  I-BUS Error */  	
 	(*fptr)(); 
 
 }
 
 void mem_manage_iaccviol(void)
 {
-	void (*fptr)(void) = (void(*)(void))0xE0000615;	    // MemManage fault : CPU tried to execute code from a eXecute Never memory region 																     // I-code fetch / Instruction Access violation  
+	void (*fptr)(void) = (void(*)(void))0xE0000615;	    /* MemManage fault : CPU tried to execute code from a eXecute Never memory region */																     // I-code fetch / Instruction Access violation  
 	(*fptr)();
 
 }
 
 void usage_fault_invstate(void) 
 {
-	void (*fptr)(void) = (void(*)(void))0x00000514; // usage fault: Invalid state due to T-Bit
+	void (*fptr)(void) = (void(*)(void))0x00000514; /* usage fault: Invalid state due to T-Bit */ 
 	(*fptr)();
 
 }
 
 void usage_fault_undefinstr(void) 
 {
-	void (*fptr)(void) = (void(*)(void))0x00001001;	 // usage fault: Undefined instruction 
+	void (*fptr)(void) = (void(*)(void))0x00001001;	 /* usage fault: Undefined instruction */
 	(*fptr)();
 }
 
 void usage_fault_div_by_zero(void) 
 {
 	SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk ; 
-	volatile uint32_t *a = (volatile uint32_t*)0xE000ED2A ;
+	volatile uint32_t *a = (volatile uint32_t*)0xE000ED2A ;		/* The Reset value of UFSR(@0xE000ED2A) is 0x00 */ 
 	volatile uint32_t b = 12; 
 
-	b = b/(*a) ;  
+	b = b/(*a) ;  /* Attempt to divide by zero without the compiler knowing */ 
 
 }
 
@@ -184,7 +184,7 @@ void enter_unpriv_mode(void)
 
 
 
-void trigger_fault (uint8_t fault_type)
+void trigger_fault (fault_type_t fault_type)
 {
 	switch(fault_type) 
 	{

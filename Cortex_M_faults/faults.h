@@ -24,7 +24,7 @@ typedef enum
 	USAGE_FAULT_NOCP,
 	BUS_FAULT_STKERR,
 	
-} FAULT_TYPE;
+} fault_type_t ;
 
 /*
  * @Brief : Disables the FPU 
@@ -150,7 +150,7 @@ void usage_fault_unaligned_mem_access(void) ;
  *
  */
 
-void trigger_fault (FAULT_TYPE fault_type) ;
+void trigger_fault (fault_type_t fault_type) ;
 
 /*
  * @Brief : Generates stacking error during exception-entry
