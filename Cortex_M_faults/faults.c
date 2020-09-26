@@ -10,8 +10,278 @@
  
 #include "TM4C123.h"                    // Device header
 #include  "faults.h" 
+#include 	"UART.h"
 
 extern void *gl_unaligned_buffer;
+
+static void delay(uint32_t ms)
+{
+	SysTick->CTRL |= (1<<0) | (1<<2) ;
+	
+	SysTick->LOAD = (SystemCoreClock/1000) - 1  ; 
+	
+	for (int i=0; i<ms; i++) 
+	{
+		while(!(SysTick->CTRL & (0x10000))) ;
+	}
+	
+	SysTick->CTRL &= ~(1<<0) ; 
+}
+
+ 
+
+static void stackdump(stack_frame_t* sp)
+{
+	delay(100) ; 
+	UART0_Tx_s(ESC bRED "\r\nStack Dump: \r\n" ESC_RESET) ; 
+	delay(100) ; 
+	
+	UART0_Tx_s("R0:  ") ;
+	UART0_Tx_hex(sp->r0) ;
+	UART0_Tx_s("\r\n") ; 
+	
+	delay(100) ; 
+	UART0_Tx_s("R1:  ") ;
+	UART0_Tx_hex(sp->r1) ;
+	UART0_Tx_s("\r\n") ;
+	
+	delay(100) ; 
+	UART0_Tx_s("R2:  ") ;
+	UART0_Tx_hex(sp->r2) ;
+	UART0_Tx_s("\r\n") ;
+	
+	delay(100) ; 
+	UART0_Tx_s("R3:  ") ;
+	UART0_Tx_hex(sp->r3) ;
+	UART0_Tx_s("\r\n") ;
+	
+	delay(100) ; 
+	UART0_Tx_s("R12: ") ;
+	UART0_Tx_hex(sp->r12) ;
+	UART0_Tx_s("\r\n") ;
+	
+	delay(100) ; 
+	UART0_Tx_s("LR:  ") ;
+	UART0_Tx_hex(sp->lr) ;
+	UART0_Tx_s("\r\n") ;
+	
+	delay(100) ; 
+	UART0_Tx_s("PC:  ") ;
+	UART0_Tx_hex(sp->pc) ;
+	UART0_Tx_s("\r\n") ;
+	
+	delay(100) ; 
+	UART0_Tx_s("xPSR:") ;
+	UART0_Tx_hex(sp->xpsr) ;
+	 
+}
+
+static void get_fault_source(void)
+{
+	if(SCB->HFSR 	& (1<<30)) 
+	{
+		if(SCB->CFSR)
+		{
+			if (SCB->CFSR & SCB_CFSR_BUSFAULTSR_Msk) 
+			{
+				delay(100) ; 
+				UART0_Tx_s(ESC bRED "\r\nBus Fault: " ESC_RESET) ; 
+				
+				uint32_t val = (SCB->CFSR & SCB_CFSR_BUSFAULTSR_Msk) & ~(SCB_CFSR_BFARVALID_Msk)  ;  
+				
+				switch(val)
+				{
+					case SCB_CFSR_IBUSERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "IBUSERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_IMPRECISERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "IMPRECISERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_PRECISERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "PRECISERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_LSPERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "LPSERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_STKERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "STKERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+				
+					case SCB_CFSR_UNSTKERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "UNSTKERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					default : break ; 
+				
+				}
+				
+			if(SCB->CFSR & SCB_CFSR_BFARVALID_Msk)
+				{
+					delay(10); 
+					UART0_Tx_s(ESC bGREEN "BFAR Valid. Faulting Address : "ESC_RESET) ; 
+					UART0_Tx_hex(SCB->BFAR) ;
+				}
+			}	
+
+			else if (SCB->CFSR & SCB_CFSR_MEMFAULTSR_Msk) 
+			{
+				delay(100) ;
+				UART0_Tx_s(ESC bRED "\r\nMemManage Fault: " ESC_RESET) ; 
+				
+				uint32_t val = (SCB->CFSR & SCB_CFSR_MEMFAULTSR_Msk) & ~(SCB_CFSR_MMARVALID_Msk)  ;  
+				
+				switch(val)
+				{
+					case SCB_CFSR_IACCVIOL_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "IACCVIOL!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_MLSPERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "MPSERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_MSTKERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "MSTKERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+				
+					case SCB_CFSR_MUNSTKERR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "MUNSTKERR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					default : break ; 
+		
+				}
+				
+			if(SCB->CFSR & SCB_CFSR_MMARVALID_Msk)
+				{
+					delay(10); 
+					UART0_Tx_s(ESC bGREEN "BFAR Valid. Faulting Address : "ESC_RESET) ; 
+					UART0_Tx_hex(SCB->MMFAR) ;
+				}
+			}
+
+			else if (SCB->CFSR & SCB_CFSR_USGFAULTSR_Msk) 
+			{
+				UART0_Tx_s(ESC bRED "\r\nUsage Fault: " ESC_RESET) ; 
+				delay(100) ; 
+				
+				uint32_t val = (SCB->CFSR & SCB_CFSR_USGFAULTSR_Msk) ;
+				
+				switch(val)
+				{
+					case SCB_CFSR_DIVBYZERO_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "Div By Zero!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_INVPC_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "INVPC!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_INVSTATE_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "INVSTATE!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+				
+					case SCB_CFSR_NOCP_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "NOCP!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+				  case SCB_CFSR_UNALIGNED_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "UNALGINED Memory Access!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					case SCB_CFSR_UNDEFINSTR_Msk : 		
+					{
+						delay(100) ;
+						UART0_Tx_s(ESC bRED "UNDEFINSTR!\r\n" ESC_RESET) ; 
+						break ; 
+					}
+					
+					default : break ; 
+				
+				}
+			}	 						
+		}
+	}
+}
+
+void HardFault_Handler(void)
+{
+	
+	/* Stop right here if it's a stacking exception */ 
+	if((SCB->CFSR & SCB_CFSR_BUSFAULTSR_Msk) == SCB_CFSR_STKERR_Msk)
+	{
+		while(1) ; 
+	}
+	
+	delay(100) ; 
+	UART0_Tx_s(ESC bCYAN"\r\n\r\nProcessor Fault!!" ESC_RESET) ;
+	
+
+	__ASM volatile(                                							 
+			"TST lr, #4 \n"
+			"ITE EQ \n"
+			"MRSEQ r0, MSP\n"
+			"MRSNE r0, PSP\n"
+		      ) ; 
+	
+	volatile uint32_t* sp ;	
+	__asm volatile("MOV %0,R0 " : "=r"(sp)::) ; 
+	
+	
+	get_fault_source() ; 
+	stackdump((stack_frame_t *)sp) ;  	
+
+	while(1) ;	
+}
 
 void disable_n_access_fpu(void) 
 {
