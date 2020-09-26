@@ -1,6 +1,6 @@
 A small project that fires System Exceptions for Arm Cortex-M3(and onwards) devices through Software. 
 
-![Terminal](https://github.com/pran005/Arm-Cortex-M-Baremetal/Cortex_M_faults/Terminal.png)
+![Terminal](https://github.com/pran005/Arm-Cortex-M-Baremetal/blob/master/Cortex_M_faults/Terminal.PNG)
 
 Note: In Bus Fault Exception the STKERR sub-type is implemented by using up the entire SRAM. Any function calls in the Fault Handler may lead CPU to a lockup state.
       This has been taken care of in this example by entering into an infinite loop in case a STKERR is detected. Derivatives of this code example shall take appropriate actions. 
