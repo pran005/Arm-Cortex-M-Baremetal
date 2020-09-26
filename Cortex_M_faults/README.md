@@ -1,4 +1,4 @@
-<h2> A small project that fires System Exceptions for Arm Cortex-M3(and onwards) devices through Software. </h2> 
+<h3> A small project that fires System Exceptions for Arm Cortex-M3(and onwards) devices through Software. </h3> 
 
 
 ![Terminal](https://github.com/pran005/Arm-Cortex-M-Baremetal/blob/master/Cortex_M_faults/Terminal.PNG)
