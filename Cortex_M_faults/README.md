@@ -10,12 +10,11 @@ Note: In Bus Fault Exception the STKERR sub-type is implemented by filling up th
 The code can be reused for any ARM-Cortex M3 (and onwards) devices, with a slight exception: 
   
   1. This code example was written for a Tiva C Eval Kit: EK-TM4C123GXL. 
-     One peripheral interrupt (QEI) is generated in order to fire an exception. This peripheral interrupt is specific to this device. 
+     One peripheral interrupt (QEI) is used in order to fire an exception. This peripheral interrupt is specific to this device. 
      One may choose to replace it with any other peripheral interrupt in their specific device.  
   
   2. The Debug prints are taken over UART0 which, again is specific to this device. One may choose to use the same or a different mechanism like ITM block or Bit Banging protocols
-     by simply removing the UART source files and adding their custom implementations instead. 
-  
-In order to use this code example for any other device the above points shall be worked upon for achieving similar functionality. 
+     by simply removing the UART source files and adding their custom implementations in their place. 
+
 
      
