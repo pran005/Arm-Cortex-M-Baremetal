@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    faults.c 
   * @author  Pranjal Shrivastava
-  * @version v1.5 - Cortex-M Faults  
-  * @date    12-September-2020
+  * @version v2.0 - Cortex-M Faults  
+  * @date    28-September-2020
   * @brief   Driver code for implementing faults 
   ******************************************************************************
  **/
@@ -253,9 +253,20 @@ static void get_fault_source(void)
 	}
 }
 
-void HardFault_Handler(void)
+__attribute__ ((naked))void HardFault_Handler(void)
 {
-	
+	/* Check Faulting SP */ 
+		__ASM volatile(                                							 
+			"TST lr, #4 \n"
+			"ITE EQ \n"
+			"MRSEQ r0, MSP\n"
+			"MRSNE r0, PSP\n"
+			"B Hard_Fault_Handler"
+		) ; 
+}	
+
+void Hard_Fault_Handler(stack_frame_t *sp)
+{
 	/* Stop right here if it's a stacking exception */ 
 	if((SCB->CFSR & SCB_CFSR_BUSFAULTSR_Msk) == SCB_CFSR_STKERR_Msk)
 	{
@@ -264,18 +275,6 @@ void HardFault_Handler(void)
 	
 	delay(100) ; 
 	UART0_Tx_s(ESC bCYAN"\r\n\r\nProcessor Fault!!" ESC_RESET) ;
-	
-
-	__ASM volatile(                                							 
-			"TST lr, #4 \n"
-			"ITE EQ \n"
-			"MRSEQ r0, MSP\n"
-			"MRSNE r0, PSP\n"
-		      ) ; 
-	
-	volatile uint32_t* sp ;	
-	__asm volatile("MOV %0,R0 " : "=r"(sp)::) ; 
-	
 	
 	get_fault_source() ; 
 	stackdump((stack_frame_t *)sp) ;  	

@@ -1,3 +1,13 @@
+/**
+  ******************************************************************************
+  * @file    UART.h
+  * @author  Pranjal Shrivastava
+  * @version v2.0 - Cortex-M Faults  
+  * @date    28-September-2020
+  * @brief   Debug print drivers  
+  ******************************************************************************
+ **/
+ 
 #include "TM4C123.h"                    // Device header
 #include  "UART.h"
 #include <string.h>

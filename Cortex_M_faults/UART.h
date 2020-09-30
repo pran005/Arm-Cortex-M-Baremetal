@@ -1,3 +1,12 @@
+/**
+  ******************************************************************************
+  * @file    UART.h
+  * @author  Pranjal Shrivastava
+  * @version v2.0 - Cortex-M Faults  
+  * @date    28-September-2020
+  * @brief   Debug print header files   
+  ******************************************************************************
+ **/
 #ifndef _UART_H
 #define _UART_H
 

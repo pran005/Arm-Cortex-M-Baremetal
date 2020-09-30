@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    main.c 
   * @author  Pranjal Shrivastava
-  * @version v1.5 - Cortex-M Faults  
-  * @date    12-September-2020
+  * @version v2.0 - Cortex-M Faults  
+  * @date    28-September-2020
   * @brief   Main program body 
   ******************************************************************************
  **/
