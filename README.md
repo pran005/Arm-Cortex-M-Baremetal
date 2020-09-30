@@ -1,2 +1,2 @@
 # Arm-Cortex-M-Baremetal
-A small weekend playground to understand Arm Cortex-M devices better. 
+<h3> A small weekend playground to understand Arm Cortex-M devices better. <h3>
