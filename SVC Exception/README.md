@@ -1,4 +1,4 @@
-<h3> SVC Exception Example <h3> 
+<h3> SVC Exception Example </h3> 
 
 This projects show cases simple use case of some services being provided by SuperVisor Call Exception in Arm Cortex M. 
 
